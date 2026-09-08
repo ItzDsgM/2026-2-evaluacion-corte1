@@ -50,11 +50,18 @@ class StudentService {
     // Un solo estudiante inválido NO debe tumbar el resto del lote: atrapa el error por estudiante, no solo por el arreglo completo.
     async bulkCreate(studentsData: StudentInput[]): Promise<BulkCreateResult>{
         
-        const result:BulkCreateResult =  { created: [] , skipped: []}
+        const result:BulkCreateResult =  { created: [] , skipped: []};
         
-       for(const email of studentsData.name){
+       for(const student of studentsData)
+
         try {
-            
+            const email: String = student.email;
+            const skipped = await StudentModel.findOne(
+                { email }
+            );
+            if(skipped){
+                result.skipped.push({ "email" : email, "reason":"Ya esxiste un estudiante con este correo"})
+            }
         } catch (error) {
             
         }
