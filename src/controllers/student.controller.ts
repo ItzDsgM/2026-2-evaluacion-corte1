@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { StudentDocument, StudentInput } from "../models/student.model";
+import { BulkCreateResult, StudentDocument, StudentInput } from "../models/student.model";
 import { studentService } from "../services/student.service";
 
 class StudentController{
@@ -57,8 +57,16 @@ class StudentController{
     // TODO (Reto 1 - Bulk create): validar que request.body sea un arreglo y delegar en studentService.bulkCreate
     async bulkCreate(request: Request, response: Response){
         try {
-            const students : string[] = request.body as Partial<BulkToggleInput>;
-            if 
+            const body = request.body as Partial<StudentInput>;
+            if (!Array.isArray(body.name)){
+                response.status(400).json({message: "Se debe enviar { students: StudentInput{name: string, age: number, email: string, isActive: boolean, nickname: string}}"})
+                return;
+            }
+
+            const result = await studentService.bulkCreate(request.body);
+            response.status(200).json(result);
+
+
         } catch (error) {
             response.status(501).json({ message: "Not implemented" });
         }

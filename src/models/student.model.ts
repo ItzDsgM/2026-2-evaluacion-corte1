@@ -10,7 +10,6 @@ export interface StudentInput{
 
 export interface StudentDocument extends StudentInput ,mongoose.Document{}
 
-// TODO (Reto 1 - Bulk create): usa esta forma para la respuesta de POST /students/bulk
 export interface BulkCreateResult {
     created: StudentDocument[];
     skipped: { email: string; reason: string }[];
