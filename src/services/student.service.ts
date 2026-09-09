@@ -52,27 +52,51 @@ class StudentService {
         
         const result:BulkCreateResult =  { created: [] , skipped: []};
         
-       for(const student of studentsData)
+       for(const student of studentsData){
 
         try {
-            const email: String = student.email;
-            const skipped = await StudentModel.findOne(
-                { email }
-            );
-            if(skipped){
-                result.skipped.push({ "email" : email, "reason":"Ya esxiste un estudiante con este correo"})
+            const create = await StudentModel.findOne(student);
+            if(!create){
+                const email = student.email
+
+                result.skipped.push({email, "reason":"Ya esxiste un estudiante con este correo"})
+            } else {
+                result.created.push(create);
             }
         } catch (error) {
-            
+            console.log(this.handleError(error))
+            throw error;
         }
        }
+       return result;
     }
 
     // TODO (Reto 2 - Search): implementar.
     // Construye un filtro de Mongoose SOLO con los criterios presentes en el query (los ausentes no deben filtrar nada).
     // isActive: "true"/"false" -> boolean | minAge/maxAge -> rango con $gte/$lte sobre "age" | name -> coincidencia parcial case-insensitive con $regex
     async search(query: StudentSearchQuery): Promise<StudentDocument[]>{
-        throw new Error("Not implemented");
+        try {
+            const filter: Record<string, unknown> = {};
+            if(query.isActive !== undefined){
+                filter.isActive = query.isActive === "true";
+            }
+            if(query.minAge !== undefined){
+                filter.minAge = {$gte:query.minAge}
+            }
+            if(query.maxAge !== undefined){
+                filter.isActive = {$lte:query.maxAge}
+            }
+            if(query.name !== undefined){
+                filter.name = { $regex: query.name, $options: "i" };
+            }
+
+            const students: StudentDocument[] = await StudentModel.find(filter);
+            return students;
+
+        } catch (error) {
+            console.log(this.handleError(error));
+            throw error;
+        }
     }
 
     // TODO (Reto 3 - Delete): implementar.
