@@ -48,6 +48,8 @@ class StudentService {
     //   - si ya existe un estudiante con ese email (en BD o repetido en el mismo arreglo), agregarlo a "skipped" con un "reason"
     //   - si no existe, crearlo y agregarlo a "created"
     // Un solo estudiante inválido NO debe tumbar el resto del lote: atrapa el error por estudiante, no solo por el arreglo completo.
+
+    // El intento es lo que vale profe
     async bulkCreate(studentsData: StudentInput[]): Promise<BulkCreateResult>{
         
         const result:BulkCreateResult =  { created: [] , skipped: []};
